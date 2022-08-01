@@ -24,3 +24,8 @@ administrateur pour avoir le script en haut et les actions effectuées en bas.
 Image 26 : Console PowerShell ISE
 Il sera possible aussi de l’exécuter en « .exe » avec un logiciel qui convertit les « .ps1 » en
 « .exe ». Pour ma part je mettrai le script dans le chemin C:\script\migrationad
+
+
+
+
+source : https://www.rebeladmin.com/2018/01/step-step-migration-guide-active-directory-2016-powershell-guide/
