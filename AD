@@ -1,0 +1,127 @@
+Start-transcript -path "C:\log\migration.log"
+
+Write-Host ""
+Write-Host "SCRIPT MIGRATION"
+Write-Host ""
+
+function menu 
+{
+	Write-Host
+    Write-Host "1: InstallAD"
+	Write-Host
+	Write-Host
+    Write-Host "2: PromotionAD"
+    Write-Host
+	Write-Host "3: VerifService"	
+	Write-Host
+	Write-Host "4: FSMO"
+	Write-Host
+	Write-Host "5: VerifFSMO"
+	Write-Host
+	Write-Host "6: SupprADDS"
+	Write-Host
+	Write-Host "7: Retrograder"
+	Write-Host
+	Write-Host "8: ADdomaine"
+	Write-Host
+	Write-Host "9: ADforet"
+	Write-Host
+	Write-Host "10: Log"
+	Write-Host
+	Write-Host "11: Redemmarage"	
+$choix=Read-Host " Votre Choix "
+    switch ($choix)
+    
+    {
+        1 {InstallAD;pause;menu}
+		2 {PromotionAD;pause;menu}
+		3 {VerifService;pause;menu}
+		4 {FSMO;pause;menu}
+		5 {VerifFSMO;pause;menu}
+		6 {SupprADDS;pause;menu}
+		7 {Retrograder;pause;menu}
+		8 {ADdomaine;pause;menu}
+		9 {ADforet;pause;menu}
+		10 {Log;pause;menu}
+		11 {Redemmarage;pause;menu}
+		
+	}
+}
+function InstallAD()
+{
+Install-windowsfeature AD-domain-services -IncludeManagementTools
+pause
+Import-Module ADDSDeployment
+}
+
+function PromotionAD()
+{
+Install-ADDSDomainController
+-CreateDnsDelegation:$false
+-InstallDns:$true
+-DomainName "insight.lan"
+-DomainNetbiosName "INSIGHT"
+-ReplicationSourceDC "HyperV-2021.insight.lan"
+-SiteName "Default-First-Site-Name"
+-DatabasePath "C:\Windows\NTDS"
+-LogPath "C:\Windows\NTDS"
+-SysvolPath "C:\Windows\SYSVOL"
+-Force:$true	
+-NoRebootOnCompletion:$true `
+}
+
+function VerifService()
+{
+Get-Service adws,kdc,netlogon,dns	
+}
+
+function FSMO()
+{
+Move-ADDirectoryServerOperationMasterRole -Identity AD-2016 -OperationMasterRole SchemaMaster, DomainNamingMaster, PDCEmulator, RIDMaster, InfrastructureMaster
+}
+
+function VerifFSMO()
+{
+Netdom query fsmo	
+}
+
+function Retrograder()
+{
+Uninstall-ADDSDomainController -DemoteOperationMasterRole -RemoveApplicationPartition -IgnoreLastDNSServerForZone	
+}
+function SupprADDS()
+{
+Uninstall-WindowsFeature -Name AD-Domain-Services
+}
+function ADdomaine()
+{
+Set-ADDomainMode -identity insight.lan -DomainMode Windows2016Domain	
+}
+
+function ADforet()
+{
+Set-ADForestMode -Identity insight.lan -ForestMode Windows2016Forest	
+}
+
+function Log()
+{
+Get-ADDomain | fl Name,DomainMode
+pause
+Get-ADForest | fl Name,ForestMode
+pause
+Get-EventLog -LogName 'Directory Service' | where {$_.eventID -eq 2039 -or $_.eventID -eq 2040} | Format-List
+pause
+Get-EventLog -LogName 'Directory Service' | where {$_.eventID -eq 1458} | Format-List
+pause
+Get-EventLog -LogName 'Directory Service' | Format-List
+pause
+Get-ADDomainController -Filter * | Format-Table Name, IPv4Address	
+}
+function restart()
+{
+restart-computer
+}
+menu
+Stop-Transcript
+
+
