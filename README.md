@@ -16,6 +16,9 @@ Sur l’ancien serveur dès que la migration a été faite il faudra :
 - Vérifier que les différentes actions ont bien été réalisées à l’aide de la fonction de
 LOG.
 - Redémarrer l’équipement.
+
+
+
 Pour lancer ce script il sera possible de le lancer en PowerShell, PowerShell ISE en
 administrateur pour avoir le script en haut et les actions effectuées en bas.
 Image 26 : Console PowerShell ISE
